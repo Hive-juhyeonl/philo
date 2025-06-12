@@ -3,37 +3,43 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: JuHyeon <juhyeonl@student.hive.fi>         +#+  +:+       +#+         #
+#    By: ljh3900 <ljh3900@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/13 00:00:00 by JuHyeon           #+#    #+#              #
-#    Updated: 2025/05/13 00:00:00 by JuHyeon          ###   ########.fr        #
+#    Updated: 2025/06/12 02:40:20 by ljh3900          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME	= philo
+NAME	=	philo
+CC		=	cc
+CFLAGS	=	-Wall -Wextra -Werror -Iinclude
+RM		=	rm -rf
 
-CC		= cc
-CFLAGS	= -Wall -Wextra -Werror
+OBJDIR	=	objs
 
-SRCS	= srcs/main.c \
-		  srcs/utils.c \
-		  srcs/init.c \
-		  srcs/philo_routine.c \
-		  srcs/monitor.c \
-		  srcs/clean.c
+SRCS	=	srcs/init.c \
+			srcs/main.c \
+			srcs/monitor.c \
+			srcs/routine_cmd.c \
+			srcs/routine.c \
+			srcs/utils.c
 
-OBJS	= $(SRCS:.c=.o)
+OBJS	= $(SRCS:%.c=$(OBJDIR)/%.o)
 
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) -lpthread
+	$(CC) $(CFLAGS) $(OBJS) -lpthread -o $(NAME)
+
+$(OBJDIR)/%.o: %.c include/philo.h
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS)
+	$(RM) $(OBJDIR)
 
 fclean: clean
-	rm -f $(NAME)
+	$(RM) $(NAME)
 
 re: fclean all
 

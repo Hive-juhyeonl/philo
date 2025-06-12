@@ -3,62 +3,69 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JuHyeon <juhyeonl@student.hive.fi>         +#+  +:+       +#+        */
+/*   By: ljh3900 <ljh3900@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/01 17:42:38 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/02/28 15:06:01 by JuHyeon          ###   ########.fr       */
+/*   Created: 2025/06/12 02:36:06 by ljh3900           #+#    #+#             */
+/*   Updated: 2025/06/12 02:59:12 by ljh3900          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philo.h"
+#include "../include/philo.h"
+
+void	msleep(long long ms)
+{
+	long long	start;
+
+	start = get_time_ms();
+	while (get_time_ms() - start < ms)
+		usleep(100);
+}
+
+void	print_status(t_philo *philo, char *msg)
+{
+	long long	timestamp;
+
+	pthread_mutex_lock(&philo->info->print_mutex);
+	if (!philo->info->someone_died)
+	{
+		timestamp = get_time_ms() - philo->info->start_time;
+		ft_putnbr(timestamp);
+		write(1, " ", 1);
+		ft_putnbr(philo->id);
+		write(1, " ", 1);
+		ft_putstr_fd(msg, 1);
+		write(1, "\n", 1);
+	}
+	pthread_mutex_unlock(&philo->info->print_mutex);
+}
 
 long long	get_time_ms(void)
 {
 	struct timeval	tv;
 
 	gettimeofday(&tv, NULL);
-	return ((long long)(tv.tv_sec) * 1000 + (tv.tv_usec) / 1000);
+	return ((long long)(tv.tv_sec * 1000) + (tv.tv_usec / 1000));
 }
 
-void	my_usleep(long long ms)
+void	ft_putnbr(int n)
 {
-	long long	start;
+	char	c;
 
-	start = get_time_ms();
-	while (get_time_ms() - start < ms)
-		usleep(500);
+	if (n >= 10)
+		ft_putnbr(n / 10);
+	c = '0' + (n % 10);
+	write(1, &c , 1);
 }
 
-void	print_status(t_philo *philo, const char *msg)
-
+int	ft_putstr_fd(char *msg, int fd)
 {
-	long long	timestamp;
+	int	i;
 
-	pthread_mutex_lock(&philo->info->print_mutex);
-	if (!philo->info->someone_died
-		&& philo->info->finished_philos < philo->info->num_philo)
+	i = 0;
+	while (msg[i])
 	{
-		timestamp = get_time_ms() - philo->info->start_time;
-		printf("%lld %d %s\n", timestamp, philo->id, msg);
+		write(fd, &msg[i], 1);
+		i++;
 	}
-	pthread_mutex_unlock(&philo->info->print_mutex);
-}
-
-int	ft_atoi(const char *str)
-{
-	int	res;
-	int	sign;
-
-	res = 0;
-	sign = 1;
-	while (*str == ' ' || (9 <= *str && *str <= 13))
-		str++;
-	if (*str == '+' || *str == '-')
-	{
-		if (*str++ == '-')
-			sign = -1;
-	}
-	while ('0' <= *str && *str <= '9')
-		res = res * 10 + (*str++ - '0');
-	return (res * sign);
+	return (1);
 }

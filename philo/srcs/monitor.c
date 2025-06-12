@@ -3,43 +3,36 @@
 /*                                                        :::      ::::::::   */
 /*   monitor.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JuHyeon <juhyeonl@student.hive.fi>         +#+  +:+       +#+        */
+/*   By: ljh3900 <ljh3900@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/01 17:42:38 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/02/28 15:06:01 by JuHyeon          ###   ########.fr       */
+/*   Created: 2025/06/12 00:04:05 by ljh3900           #+#    #+#             */
+/*   Updated: 2025/06/12 03:49:36 by ljh3900          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philo.h"
+#include "../include/philo.h"
 
-void	*monitor_routine(void *arg)
+void	monitor_routine(void *arg)
 {
-	t_info		*info;
-	int			i;
-	long long	now;
+	t_info	*info;
+	int		i;
 
 	info = (t_info *)arg;
-	while (!info->someone_died && info->finished_philos < info->num_philo)
+	while (1)
 	{
 		i = 0;
 		while (i < info->num_philo)
 		{
 			pthread_mutex_lock(&info->meal_mutex);
-			now = get_time_ms();
-			if ((now - info->philos[i].last_meal) > info->ttd)
+			if (get_time_ms() - info->philo_arr[i].last_meal >= info->tt_die)
 			{
-				info->someone_died = 1;
-				pthread_mutex_lock(&info->print_mutex);
-				printf("%lld %d died\n",
-					now - info->start_time, info->philos[i].id);
-				pthread_mutex_unlock(&info->print_mutex);
+				ft_died(&info->philo_arr[i]);
 				pthread_mutex_unlock(&info->meal_mutex);
-				return (NULL);
+				return ;
 			}
 			pthread_mutex_unlock(&info->meal_mutex);
 			i++;
 		}
-		usleep(1000);
+		usleep(500);
 	}
-	return (NULL);
 }
