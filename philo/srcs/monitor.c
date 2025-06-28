@@ -3,36 +3,40 @@
 /*                                                        :::      ::::::::   */
 /*   monitor.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ljh3900 <ljh3900@student.42.fr>            +#+  +:+       +#+        */
+/*   By: juhyeonl <juhyeonl@student.42.fr>          #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/12 00:04:05 by ljh3900           #+#    #+#             */
-/*   Updated: 2025/06/12 03:49:36 by ljh3900          ###   ########.fr       */
+/*   Created: 2025-06-19 16:31:19 by juhyeonl          #+#    #+#             */
+/*   Updated: 2025-06-19 16:31:19 by juhyeonl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
 
-void	monitor_routine(void *arg)
+void *monitor_fn(void *arg)
 {
-	t_info	*info;
-	int		i;
+    t_data *d;
+    int     i;
 
-	info = (t_info *)arg;
-	while (1)
-	{
-		i = 0;
-		while (i < info->num_philo)
-		{
-			pthread_mutex_lock(&info->meal_mutex);
-			if (get_time_ms() - info->philo_arr[i].last_meal >= info->tt_die)
-			{
-				ft_died(&info->philo_arr[i]);
-				pthread_mutex_unlock(&info->meal_mutex);
-				return ;
-			}
-			pthread_mutex_unlock(&info->meal_mutex);
-			i++;
-		}
-		usleep(500);
-	}
+    d = arg;
+    while (!check_terminate(d))
+    {
+        i = 0;
+        while (i < d->philo_cnt && !(d->someone_died))
+        {
+            t_philo *p = d->philos[i];
+            size_t   now = get_time();
+            pthread_mutex_lock(&p->mt_meal);
+            if (now - p->last_meal_ms > d->time_to_die)
+            {
+                d->someone_died = true;
+                print_state(p, "died");
+            }
+            pthread_mutex_unlock(&p->mt_meal);
+            i++;
+        }
+        if (d->must_eat > 0 && d->full_count >= d->philo_cnt)
+            d->someone_died = true;
+        usleep(1000);
+    }
+    return (NULL);
 }

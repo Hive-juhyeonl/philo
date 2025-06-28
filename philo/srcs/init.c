@@ -3,84 +3,93 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ljh3900 <ljh3900@student.42.fr>            +#+  +:+       +#+        */
+/*   By: juhyeonl <juhyeonl@student.42.fr>          #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/12 01:00:46 by ljh3900           #+#    #+#             */
-/*   Updated: 2025/06/12 04:16:56 by ljh3900          ###   ########.fr       */
+/*   Created: 2025-06-19 16:30:21 by juhyeonl          #+#    #+#             */
+/*   Updated: 2025-06-19 16:30:21 by juhyeonl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
 
-int	ft_atoi(char *str)
+static int	parse_args(t_data *d, int ac, char **av)
 {
-	int	res;
-	int	sign;
-
-	res = 0;
-	sign = 1;
-	while (*str == ' ' || (9 <= *str && *str <= 13))
-		str++;
-	if (*str == '+' || *str == '-')
-	{
-		if (*str++ == '-')
-			sign = -1;
-	}
-	while ('0' <= *str && *str <= '9')
-		res = res * 10 + (*str++ - '0');
-	return (res * sign);
-}
-
-int	info_init(t_info *info, int ac, char **av)
-{
-	int	i;
-
-	memset(info, 0, sizeof(t_info));
-	info->num_philo = ft_atoi(av[1]);
-	info->tt_die = ft_atoi(av[2]);
-	info->tt_eat = ft_atoi(av[3]);
-	info->tt_sleep = ft_atoi(av[4]);
+	if (ac != 5 && ac != 6)
+		return (1);
+	d->philo_cnt     = ft_atoi(av[1]);
+	d->time_to_die   = (size_t)ft_atoi(av[2]);
+	d->time_to_eat   = (size_t)ft_atoi(av[3]);
+	d->time_to_sleep = (size_t)ft_atoi(av[4]);
 	if (ac == 6)
-		info->m_eat_cnt = ft_atoi(av[5]);
+		d->must_eat = (int)ft_atoi(av[5]);
 	else
-		info->m_eat_cnt = -1;
-	info->forks = malloc(sizeof(pthread_mutex_t) * info->num_philo);
-	if (!info->forks)
-	{
-		write(2, "[DEBUG] : forks fail\n", 21);
+		d->must_eat = -1;
+	if (d->philo_cnt < 1
+	 || d->time_to_die == 0
+	 || d->time_to_eat == 0
+	 || d->time_to_sleep == 0
+	 || (ac == 6 && d->must_eat < 1))
 		return (1);
-	}
-	i = 0;
-	while (i < info->num_philo)
-	{
-		pthread_mutex_init(&info->forks[i], NULL);
-		i++;
-	}
-	info->philo_arr = malloc(sizeof(t_philo) * info->num_philo);
-	if (!info->philo_arr)
-	{
-		write(2, "[DEBUG] : philo_arr fail\n", 25);
-		return (1);
-	}
-	pthread_mutex_init(&info->print_mutex, NULL);
-	pthread_mutex_init(&info->meal_mutex, NULL);
 	return (0);
 }
 
-int	philo_init(t_info *info)
+static int init_mutexes(t_data *data)
 {
 	int	i;
 
+	data->forks = malloc(sizeof(t_mutex) * data->philo_cnt);
+	if (!data->forks)
+		return (write(2, "malloc Error\n", 13), 1);
 	i = 0;
-	while (i < info->num_philo)
+	while (i < data->philo_cnt)
 	{
-		info->philo_arr[i].id = i + 1;
-		info->philo_arr[i].eat_cnt = 0;
-		info->philo_arr[i].last_meal = 0;
-		info->philo_arr[i].left_fork = &info->forks[i];
-		info->philo_arr[i].right_fork = &info->forks[(i + 1) % info->num_philo];
-		info->philo_arr[i].info = info;
+		if (pthread_mutex_init(&data->forks[i], NULL))
+			return (write(2, "mutex_init Error\n", 18), 1);
 		i++;
 	}
+	if (pthread_mutex_init(&data->mt_print, NULL)
+	 || pthread_mutex_init(&data->mt_terminate, NULL))
+		return (write(2, "mutex_init Error\n", 18), 1);
+	data->someone_died = false;
+	data->full_count   = 0;
+	return (0);
+}
+
+static int init_philos(t_data *data)
+{
+	int	i;
+
+	data->philos = malloc(sizeof(t_philo *) * data->philo_cnt);
+	if (!data->philos)
+		return (write(2, "malloc Error\n", 13), 1);
+	i = 0;
+	while (i < data->philo_cnt)
+	{
+		data->philos[i] = malloc(sizeof(t_philo));
+		if (!data->philos[i])
+			return (write(2, "malloc Error\n", 13), 1);
+		data->philos[i]->id           = i + 1;
+		data->philos[i]->data         = data;
+		data->philos[i]->meal_eaten   = 0;
+		data->philos[i]->is_full      = false;
+		data->philos[i]->last_meal_ms = data->start_ms;
+		if (pthread_mutex_init(&data->philos[i]->mt_meal, NULL))
+			return (write(2, "mutex_init Error\n", 18), 1);
+		data->philos[i]->left_fork   = &data->forks[i];
+		data->philos[i]->right_fork  = &data->forks[(i + 1) % data->philo_cnt];
+		i++;
+	}
+	return (0);
+}
+
+int init_data(t_data *data, int argc, char **argv)
+{
+	if (parse_args(data, argc, argv))
+		return (printf("Usage: %s number_of_philos \
+			time_to_die time_to_eat time_to_sleep [must_eat]\n", argv[0]), 1);
+	if (init_mutexes(data))
+		return (1);
+	if (init_philos(data))
+		return (1);
 	return (0);
 }

@@ -3,47 +3,73 @@
 /*                                                        :::      ::::::::   */
 /*   routine.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ljh3900 <ljh3900@student.42.fr>            +#+  +:+       +#+        */
+/*   By: juhyeonl <juhyeonl@student.42.fr>          #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/12 02:12:35 by ljh3900           #+#    #+#             */
-/*   Updated: 2025/06/12 04:45:46 by ljh3900          ###   ########.fr       */
+/*   Created: 2025-06-19 16:31:01 by juhyeonl          #+#    #+#             */
+/*   Updated: 2025-06-19 16:31:01 by juhyeonl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
 
-void	ft_died(t_philo *philo)
+static void take_forks(t_philo *p)
 {
-	pthread_mutex_lock(&philo->info->print_mutex);
-	philo->info->someone_died = true;
-	ft_putnbr(get_time_ms() - philo->info->start_time);
-	write(1, " ", 1);
-	ft_putnbr(philo->id);
-	write(1, " died\n", 6);
-	pthread_mutex_unlock(&philo->info->print_mutex);
+	pthread_mutex_lock(p->left_fork);
+	print_state(p, "has taken a fork");
+	pthread_mutex_lock(p->right_fork);
+	print_state(p, "has taken a fork");
 }
 
-void	*philo_routine(void *arg)
+static void put_forks(t_philo *p)
 {
-	t_philo	*philo;
+	pthread_mutex_unlock(p->left_fork);
+	pthread_mutex_unlock(p->right_fork);
+}
 
-	philo = (t_philo *)arg;
-	if (philo->info->num_philo == 1)
+static void solo_routine(t_philo *p)
+{
+	pthread_mutex_lock(p->left_fork);
+	print_state(p, "has taken a fork");
+	precise_usleep(p->data->time_to_die);
+	print_state(p, "died");
+	pthread_mutex_unlock(p->left_fork);
+}
+
+static void	group_routine(t_philo *p)
+{
+	if (p->id % 2 == 0)
+		precise_usleep(p->data->time_to_eat);
+	while (!check_terminate(p->data))
 	{
-		ft_up_fork(philo);
-		msleep(philo->info->tt_die);
-		ft_died(philo);
-		return (NULL);
+		take_forks(p);
+		p->meal_eaten++;
+		pthread_mutex_lock(&p->mt_meal);
+		p->last_meal_ms = get_time();
+		pthread_mutex_unlock(&p->mt_meal);
+		print_state(p, "is eating");
+		precise_usleep(p->data->time_to_eat);
+		put_forks(p);
+		if (p->data->must_eat > 0 && p->meal_eaten >= p->data->must_eat && !p->is_full)
+		{
+			p->is_full = true;
+			p->data->full_count++;
+		}
+		print_state(p, "is sleeping");
+		precise_usleep(p->data->time_to_sleep);
+		print_state(p, "is thinking");
+		usleep(1);
 	}
-	if (philo->id % 2 == 0)
-		msleep(philo->info->tt_eat);
-	while (!philo->info->someone_died)
-	{
-		ft_up_fork(philo);
-		ft_eat(philo);
-		ft_down_fork(philo);
-		ft_sleep(philo);
-		ft_think(philo);
-	}
+}
+
+void *philo_routine(void *arg)
+{
+	t_philo	*p;
+
+	p = arg;
+	// printf("DEBUG philo %d started, last_meal_ms=%zu\n", p->id, p->last_meal_ms);
+	if (p->data->philo_cnt == 1)
+		solo_routine(p);
+	else
+		group_routine(p);
 	return (NULL);
 }
