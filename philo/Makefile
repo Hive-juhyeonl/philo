@@ -1,32 +1,39 @@
-NAME	=	philo
-CC		=	cc
-CFLAGS	=	-Wall -Wextra -Werror -Iinclude
-RM		=	rm -rf
-OBJDIR	=	objs
-SRCS        = \
-			srcs/main.c \
-			srcs/init.c \
-			srcs/utils.c \
-			srcs/routine.c \
-			srcs/monitor.c \
-			srcs/ft_atoi.c
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: JuHyeon <juhyeonl@student.hive.fi>         +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/05/13 00:00:00 by JuHyeon           #+#    #+#              #
+#    Updated: 2025/05/13 00:00:00 by JuHyeon          ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-OBJS	= $(SRCS:%.c=$(OBJDIR)/%.o)
+NAME	= philo
+
+CC		= cc
+CFLAGS	= -Wall -Wextra -Werror
+
+SRCS	= srcs/main.c \
+		  srcs/utils.c \
+		  srcs/init.c \
+		  srcs/philo_routine.c \
+		  srcs/monitor.c \
+		  srcs/clean.c
+
+OBJS	= $(SRCS:.c=.o)
 
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -lpthread -o $(NAME)
-
-$(OBJDIR)/%.o: %.c include/philo.h
-	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) -lpthread
 
 clean:
-	$(RM) $(OBJDIR)
+	rm -f $(OBJS)
 
 fclean: clean
-	$(RM) $(NAME)
+	rm -f $(NAME)
 
 re: fclean all
 

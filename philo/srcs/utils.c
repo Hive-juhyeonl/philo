@@ -3,55 +3,79 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juhyeonl <juhyeonl@student.42.fr>          #+#  +:+       +#+        */
+/*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025-06-19 16:24:20 by juhyeonl          #+#    #+#             */
-/*   Updated: 2025-06-19 16:24:20 by juhyeonl         ###   ########.fr       */
+/*   Created: 2025/08/26 11:19:36 by JuHyeon           #+#    #+#             */
+/*   Updated: 2025/08/26 11:30:50 by JuHyeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/philo.h"
+#include "../includes/philo.h"
 
-size_t get_time(void)
+long long	get_time_ms(void)
 {
 	struct timeval	tv;
+
 	gettimeofday(&tv, NULL);
-	return (tv.tv_sec * 1000UL + tv.tv_usec / 1000UL);
+	return ((long long)tv.tv_sec * 1000 + tv.tv_usec / 1000);
 }
 
-void precise_usleep(size_t ms)
+void	my_usleep(long long ms)
 {
-	size_t start;
+	long long	start;
 
-	start = get_time();
-	while (get_time() - start < ms)
-		usleep(100);
+	start = get_time_ms();
+	while ((get_time_ms() - start) < ms)
+	{
+		if (simulation_finished(NULL))
+			break ;
+		usleep(500);
+	}
 }
 
-static int ft_strcmp(const char *s1, const char *s2)
+int	simulation_finished(t_info *info)
 {
-    size_t i;
-	
-	i = 0;
-    while (s1[i] && s2[i] && s1[i] == s2[i])
-        i++;
-    return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+	int	died;
+	int	finished;
+
+	if (!info)
+		return (0);
+	pthread_mutex_lock(&info->meal_mutex);
+	died = info->someone_died;
+	finished = (info->must_eat_cnt != -1
+			&& info->finished_philos >= info->num_philo);
+	pthread_mutex_unlock(&info->meal_mutex);
+	return (died || finished);
 }
 
-void print_state(t_philo *p, const char *msg)
+void	print_status(t_philo *philo, const char *msg)
 {
-	if (p->data->someone_died && ft_strcmp(msg, "died"))
-		return ;
-	pthread_mutex_lock(&p->data->mt_print);
-	printf("%zu %d %s\n", get_time() - p->data->start_ms, p->id, msg);
-	pthread_mutex_unlock(&p->data->mt_print);
+	long long	timestamp;
+
+	pthread_mutex_lock(&philo->info->print_mutex);
+	if (!simulation_finished(philo->info))
+	{
+		timestamp = get_time_ms() - philo->info->start_time;
+		printf("%lld %d %s\n", timestamp, philo->id, msg);
+	}
+	pthread_mutex_unlock(&philo->info->print_mutex);
 }
 
-bool check_terminate(t_data *data)
+int	ft_atoi(const char *str)
 {
-	if (data->someone_died)
-		return (true);
-	if (data->must_eat > 0 && data->full_count >= data->philo_cnt)
-		return (true);
-	return (false);
+	int	res;
+	int	sign;
+
+	res = 0;
+	sign = 1;
+	while (*str == ' ' || (9 <= *str && *str <= 13))
+		str++;
+	if (*str == '+' || *str == '-')
+	{
+		if (*str++ == '-')
+			sign = -1;
+	}
+	while ('0' <= *str && *str <= '9')
+		res = res * 10 + (*str++ - '0');
+	return (res * sign);
 }

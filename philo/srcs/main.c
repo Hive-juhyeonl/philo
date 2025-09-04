@@ -3,55 +3,93 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juhyeonl <juhyeonl@student.42.fr>          #+#  +:+       +#+        */
+/*   By: juhyeonl <juhyeonl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025-06-19 16:31:52 by juhyeonl          #+#    #+#             */
-/*   Updated: 2025-06-19 16:31:52 by juhyeonl         ###   ########.fr       */
+/*   Created: 2025/08/26 11:19:50 by JuHyeon           #+#    #+#             */
+/*   Updated: 2025/08/26 13:37:16 by juhyeonl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/philo.h"
+#include "../includes/philo.h"
 
-static void destroy(t_data *data)
+static int	start_threads(t_info *info, pthread_t *monitor)
 {
-    int i;
+	int	i;
 
-    i = 0;
-    while (i < data->philo_cnt)
-    {
-        pthread_mutex_destroy(&data->forks[i]);
-        pthread_mutex_destroy(&data->philos[i]->mt_meal);
-        free(data->philos[i]);
-        i++;
-    }
-    free(data->philos);
-    free(data->forks);
-    pthread_mutex_destroy(&data->mt_print);
-    pthread_mutex_destroy(&data->mt_terminate);
+	i = 0;
+	info->start_time = get_time_ms();
+	while (i < info->num_philo)
+	{
+		pthread_mutex_lock(&info->meal_mutex);
+		info->philos[i].last_meal = info->start_time;
+		pthread_mutex_unlock(&info->meal_mutex);
+		if (pthread_create(&info->philos[i].thread, NULL,
+				philo_routine, &info->philos[i]) != 0)
+			return (1);
+		i++;
+	}
+	if (pthread_create(monitor, NULL, monitor_routine, info) != 0)
+		return (1);
+	return (0);
 }
 
-int main(int argc, char **argv)
+static void	wait_for_threads(t_info *info, pthread_t monitor)
 {
-    t_data data;
-    int    i;
+	int	i;
 
-    if (init_data(&data, argc, argv))
-        return (1);
-    // printf("DEBUG: philo_cnt=%d\n", data.philo_cnt);
-    // printf("DEBUG: argv[1]=%s, parsed=%d\n", argv[1], ft_atoi(argv[1]));
-    // printf("DEBUG init complete: philo_cnt=%d, time_to_die=%zu, ...\n", data.philo_cnt, data.time_to_die);
-    data.start_ms = get_time();
-    i = -1;
-    while (++i < data.philo_cnt)
-        data.philos[i]->last_meal_ms = data.start_ms;
-    i = -1;
-    while (++i < data.philo_cnt)
-        pthread_create(&data.philos[i]->thread, NULL, philo_routine, data.philos[i]);
-    pthread_create(&data.monitor_thread, NULL, monitor_fn, &data);
-    i = -1;
-    while (++i < data.philo_cnt)
-        pthread_join(data.philos[i]->thread, NULL);
-    pthread_join(data.monitor_thread, NULL);
-    destroy(&data);
-    return (0);
+	pthread_join(monitor, NULL);
+	i = 0;
+	while (i < info->num_philo)
+	{
+		pthread_join(info->philos[i].thread, NULL);
+		i++;
+	}
+}
+
+static int	run_simulation(t_info *info)
+{
+	pthread_t	monitor;
+
+	if (info->num_philo == 1)
+	{
+		info->start_time = get_time_ms();
+		printf("%lld %d %s\n", 0LL, 1, "has taken a fork");
+		my_usleep(info->ttd);
+		printf("%lld %d %s\n", (long long)info->ttd, 1, "died");
+		return (0);
+	}
+	if (start_threads(info, &monitor) != 0)
+	{
+		printf("Error: Thread creation failed\n");
+		return (1);
+	}
+	wait_for_threads(info, monitor);
+	return (0);
+}
+
+int	main(int argc, char **argv)
+{
+	t_info	info;
+
+	if (init_info(&info, argc, argv) != 0)
+	{
+		printf("Error: Invalid arguments\n");
+		return (1);
+	}
+	if (init_mutex(&info) != 0 || init_philos(&info) != 0)
+	{
+		printf("Error: Initialization failed\n");
+		destroy_mutex(&info);
+		free_all(&info);
+		return (1);
+	}
+	if (run_simulation(&info) != 0)
+	{
+		destroy_mutex(&info);
+		free_all(&info);
+		return (1);
+	}
+	destroy_mutex(&info);
+	free_all(&info);
+	return (0);
 }
