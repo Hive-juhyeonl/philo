@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juhyeonl <juhyeonl@student.42.fr>          +#+  +:+       +#+        */
+/*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 11:19:50 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/08/26 13:37:16 by juhyeonl         ###   ########.fr       */
+/*   Updated: 2025/09/07 22:30:31 by JuHyeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philo.h"
+#include "philo.h"
 
 static int	start_threads(t_info *info, pthread_t *monitor)
 {
@@ -23,6 +23,9 @@ static int	start_threads(t_info *info, pthread_t *monitor)
 		pthread_mutex_lock(&info->meal_mutex);
 		info->philos[i].last_meal = info->start_time;
 		pthread_mutex_unlock(&info->meal_mutex);
+		// the created threads should be released when the creation is failed in the middle.
+		// use prlimit to test
+		// and cleanup all other resources created in advance
 		if (pthread_create(&info->philos[i].thread, NULL,
 				philo_routine, &info->philos[i]) != 0)
 			return (1);
@@ -49,7 +52,10 @@ static void	wait_for_threads(t_info *info, pthread_t monitor)
 static int	run_simulation(t_info *info)
 {
 	pthread_t	monitor;
-
+// separate routine function for a single philo
+// use mutex for a single one too
+// routine : mutex lock - print status - unlock
+// in eval (Check if there is a mutex per fork and that it's used to check the fork value and/or change it.)
 	if (info->num_philo == 1)
 	{
 		info->start_time = get_time_ms();

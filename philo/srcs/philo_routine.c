@@ -6,11 +6,11 @@
 /*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 11:19:03 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/08/26 11:20:43 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/07 22:30:50 by JuHyeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philo.h"
+#include "philo.h"
 
 static void	take_forks(t_philo *philo)
 {
@@ -79,6 +79,9 @@ void	*philo_routine(void *arg)
 		print_status(philo, "is sleeping");
 		my_usleep(info->tts);
 		print_status(philo, "is thinking");
+		// give some time to pause for one philo not to eat all the time (when num is odd) 
+		if (info->num_philo % 2)
+			usleep(500);
 	}
 	return (NULL);
 }
