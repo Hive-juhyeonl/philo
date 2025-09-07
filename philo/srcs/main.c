@@ -6,7 +6,7 @@
 /*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 11:19:50 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/09/07 22:30:31 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/07 22:52:42 by JuHyeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,16 +23,15 @@ static int	start_threads(t_info *info, pthread_t *monitor)
 		pthread_mutex_lock(&info->meal_mutex);
 		info->philos[i].last_meal = info->start_time;
 		pthread_mutex_unlock(&info->meal_mutex);
-		// the created threads should be released when the creation is failed in the middle.
-		// use prlimit to test
-		// and cleanup all other resources created in advance
 		if (pthread_create(&info->philos[i].thread, NULL,
 				philo_routine, &info->philos[i]) != 0)
-			return (1);
+			return (cleanup_on_error(info, i));
 		i++;
 	}
 	if (pthread_create(monitor, NULL, monitor_routine, info) != 0)
-		return (1);
+	{
+		return (cleanup_on_error(info, info->num_philo));
+	}
 	return (0);
 }
 
