@@ -6,7 +6,7 @@
 /*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 11:19:36 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/09/08 01:31:16 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/08 02:08:33 by JuHyeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,14 +23,10 @@ long long	get_time_ms(void)
 void	my_usleep(long long ms, t_info *info)
 {
 	long long	start;
-	long long	now;
 
 	start = get_time_ms();
 	while ((get_time_ms() - start) < ms)
 	{
-		now = get_time_ms();
-		if ((now - start) >= ms)
-			break ;
 		if (simulation_finished(info))
 			break ;
 		usleep(250);
