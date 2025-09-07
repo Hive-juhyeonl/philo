@@ -6,28 +6,49 @@
 /*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 23:15:48 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/09/07 23:16:10 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/08 00:54:22 by JuHyeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+// void	take_forks(t_philo *philo)
+// {
+// 	if (philo->id % 2 == 0)
+// 	{
+// 		pthread_mutex_lock(philo->right_fork);
+// 		print_status(philo, "has taken a fork");
+// 		pthread_mutex_lock(philo->left_fork);
+// 		print_status(philo, "has taken a fork");
+// 	}
+// 	else
+// 	{
+// 		pthread_mutex_lock(philo->left_fork);
+// 		print_status(philo, "has taken a fork");
+// 		pthread_mutex_lock(philo->right_fork);
+// 		print_status(philo, "has taken a fork");
+// 	}
+// }
+
 void	take_forks(t_philo *philo)
 {
-	if (philo->id % 2 == 0)
+	t_mutex	*first_fork;
+	t_mutex	*second_fork;
+
+	if (philo->id % 2 != 0)
 	{
-		pthread_mutex_lock(philo->right_fork);
-		print_status(philo, "has taken a fork");
-		pthread_mutex_lock(philo->left_fork);
-		print_status(philo, "has taken a fork");
+		first_fork = philo->left_fork;
+		second_fork = philo->right_fork;
 	}
 	else
 	{
-		pthread_mutex_lock(philo->left_fork);
-		print_status(philo, "has taken a fork");
-		pthread_mutex_lock(philo->right_fork);
-		print_status(philo, "has taken a fork");
+		first_fork = philo->right_fork;
+		second_fork = philo->left_fork;
 	}
+	pthread_mutex_lock(first_fork);
+	print_status(philo, "has taken a fork");
+	pthread_mutex_lock(second_fork);
+	print_status(philo, "has taken a fork");
 }
 
 void	eat(t_philo *philo)
@@ -39,7 +60,7 @@ void	eat(t_philo *philo)
 	philo->last_meal = get_time_ms();
 	pthread_mutex_unlock(&info->meal_mutex);
 	print_status(philo, "is eating");
-	my_usleep(info->tte);
+	my_usleep(info->tte, info);
 	philo->eat_cnt++;
 	if (info->must_eat_cnt != -1 && philo->eat_cnt >= info->must_eat_cnt)
 	{

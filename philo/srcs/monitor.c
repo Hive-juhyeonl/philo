@@ -6,7 +6,7 @@
 /*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 11:19:20 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/09/07 22:30:46 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/08 01:30:10 by JuHyeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ void	*monitor_routine(void *arg)
 		}
 		if (check_if_all_ate(info))
 			return (NULL);
-		usleep(1000);
+		usleep(50);
 	}
 	return (NULL);
 }
