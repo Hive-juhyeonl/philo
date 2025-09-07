@@ -6,7 +6,7 @@
 /*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 11:18:37 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/09/07 22:51:41 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/07 23:05:41 by JuHyeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ int			init_philos(t_info *info);
 
 // philo_routine.c
 void		*philo_routine(void *arg);
+void		*philo_routine_single(void *arg);
 
 // monitor.c
 void		*monitor_routine(void *arg);

@@ -6,7 +6,7 @@
 /*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 11:19:03 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/09/07 22:30:50 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/07 23:05:45 by JuHyeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,19 @@ static void	put_forks(t_philo *philo)
 	pthread_mutex_unlock(philo->right_fork);
 }
 
+void	*philo_routine_single(void *arg)
+{
+	t_philo	*philo;
+
+	philo = (t_philo *)arg;
+	pthread_mutex_lock(philo->left_fork);
+	print_status(philo, "has taken a fork");
+	my_usleep(philo->info->ttd);
+	print_status(philo, "died");
+	pthread_mutex_unlock(philo->left_fork);
+	return (NULL);
+}
+
 void	*philo_routine(void *arg)
 {
 	t_philo	*philo;
@@ -79,7 +92,6 @@ void	*philo_routine(void *arg)
 		print_status(philo, "is sleeping");
 		my_usleep(info->tts);
 		print_status(philo, "is thinking");
-		// give some time to pause for one philo not to eat all the time (when num is odd) 
 		if (info->num_philo % 2)
 			usleep(500);
 	}

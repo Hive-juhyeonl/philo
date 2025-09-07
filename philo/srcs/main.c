@@ -6,7 +6,7 @@
 /*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 11:19:50 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/09/07 22:52:42 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/07 23:06:09 by JuHyeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,16 +51,14 @@ static void	wait_for_threads(t_info *info, pthread_t monitor)
 static int	run_simulation(t_info *info)
 {
 	pthread_t	monitor;
-// separate routine function for a single philo
-// use mutex for a single one too
-// routine : mutex lock - print status - unlock
-// in eval (Check if there is a mutex per fork and that it's used to check the fork value and/or change it.)
+
 	if (info->num_philo == 1)
 	{
 		info->start_time = get_time_ms();
-		printf("%lld %d %s\n", 0LL, 1, "has taken a fork");
-		my_usleep(info->ttd);
-		printf("%lld %d %s\n", (long long)info->ttd, 1, "died");
+		if (pthread_create(&info->philos[0].thread, NULL,
+				philo_routine_single, &info->philos[0]) != 0)
+			return (1);
+		pthread_join(info->philos[0].thread, NULL);
 		return (0);
 	}
 	if (start_threads(info, &monitor) != 0)
