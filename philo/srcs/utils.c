@@ -6,7 +6,7 @@
 /*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 11:19:36 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/09/07 22:30:57 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/07 23:13:12 by JuHyeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,12 +80,10 @@ int	ft_atoi(const char *str)
 	{
 		result = result * 10 + (*str - '0');
 		if (sign == 1 && result > INT_MAX)
-			return (int)INT_MAX;
+			return ((int)INT_MAX);
 		if (sign == -1 && result > (long long)INT_MAX + 1)
-			return (int)INT_MIN;
-			
+			return ((int)INT_MIN);
 		str++;
 	}
-
-	return (int)(result * sign);
+	return ((int)(result * sign));
 }

@@ -6,7 +6,7 @@
 #    By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/13 00:00:00 by JuHyeon           #+#    #+#              #
-#    Updated: 2025/09/07 22:30:15 by JuHyeon          ###   ########.fr        #
+#    Updated: 2025/09/07 23:17:00 by JuHyeon          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,8 @@ SRCS    = srcs/main.c \
           srcs/init.c \
           srcs/philo_routine.c \
           srcs/monitor.c \
-          srcs/clean.c
+          srcs/clean.c \
+		  srcs/life.c
 
 OBJS_DIR = objs/
 OBJS    = $(addprefix $(OBJS_DIR), $(notdir $(SRCS:.c=.o)))

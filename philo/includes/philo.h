@@ -6,7 +6,7 @@
 /*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 11:18:37 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/09/07 23:05:41 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/07 23:16:43 by JuHyeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,5 +74,10 @@ void		*monitor_routine(void *arg);
 void		destroy_mutex(t_info *info);
 void		free_all(t_info *info);
 int			cleanup_on_error(t_info *info, int created_count);
+
+// life.c
+void		take_forks(t_philo *philo);
+void		eat(t_philo *philo);
+void		put_forks(t_philo *philo);
 
 #endif
