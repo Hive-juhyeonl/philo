@@ -6,7 +6,7 @@
 /*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 11:19:03 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/09/08 01:29:56 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/08 02:01:19 by JuHyeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ static void	philo_eat_sleep_think(t_philo *philo)
 	take_forks(philo);
 	if (simulation_finished(info))
 	{
+		usleep(200);
 		put_forks(philo);
 		return ;
 	}
@@ -43,8 +44,8 @@ static void	philo_eat_sleep_think(t_philo *philo)
 	print_status(philo, "is sleeping");
 	my_usleep(info->tts, info);
 	print_status(philo, "is thinking");
-	if (info->num_philo % 2)
-		usleep(500);
+	// if (info->num_philo % 2)
+	// 	usleep(500);
 }
 
 void	*philo_routine(void *arg)
@@ -54,8 +55,8 @@ void	*philo_routine(void *arg)
 
 	philo = (t_philo *)arg;
 	info = philo->info;
-	if (philo->id % 2 == 1)
-		usleep(200);
+	// if (philo->id % 2 == 1)
+	// 	usleep(200);
 	// if (philo->id % 2 == 0)
 	// 	my_usleep(info->tte / 2);
 	while (!simulation_finished(info))
