@@ -6,7 +6,7 @@
 /*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 11:18:37 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/09/08 00:52:55 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/08 03:30:48 by JuHyeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,9 @@ void		free_all(t_info *info);
 int			cleanup_on_error(t_info *info, int created_count);
 
 // life.c
-void		take_forks(t_philo *philo);
+// void		take_forks(t_philo *philo);
+void		take_forks_even(t_philo *philo);
+void		take_forks_odd(t_philo *philo);
 void		eat(t_philo *philo);
 void		put_forks(t_philo *philo);
 

@@ -6,7 +6,7 @@
 /*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 11:19:03 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/09/08 02:26:07 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/08 03:28:32 by JuHyeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,10 @@ static void	philo_eat_sleep_think(t_philo *philo)
 	t_info	*info;
 
 	info = philo->info;
-	take_forks(philo);
+	if (philo->id % 2 == 0)
+		take_forks_even(philo);
+	else
+		take_forks_odd(philo);
 	if (simulation_finished(info))
 	{
 		put_forks(philo);
