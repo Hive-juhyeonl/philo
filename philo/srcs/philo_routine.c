@@ -6,7 +6,7 @@
 /*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 11:19:03 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/09/08 03:28:32 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/09 01:19:16 by JuHyeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,15 +25,46 @@ void	*philo_routine_single(void *arg)
 	return (NULL);
 }
 
+// static void	philo_eat_sleep_think(t_philo *philo)
+// {
+// 	t_info	*info;
+
+// 	info = philo->info;
+// 	if (philo->id % 2 == 0)
+// 		take_forks_even(philo);
+// 	else
+// 		take_forks_odd(philo);
+// 	if (simulation_finished(info))
+// 	{
+// 		put_forks(philo);
+// 		return ;
+// 	}
+// 	eat(philo);
+// 	put_forks(philo);
+// 	if (simulation_finished(info))
+// 		return ;
+// 	print_status(philo, "is sleeping");
+// 	my_usleep(info->tts, info);
+// 	print_status(philo, "is thinking");
+// 	if (info->num_philo % 2)
+// 		usleep(500);
+// }
+
 static void	philo_eat_sleep_think(t_philo *philo)
 {
 	t_info	*info;
 
 	info = philo->info;
+    
+	// 생각하는 상태를 출력한 후, 잠시 대기하여 포크 경쟁을 완화합니다.
+	print_status(philo, "is thinking");
+	usleep(100); // 100ms 지연 추가
+
 	if (philo->id % 2 == 0)
 		take_forks_even(philo);
 	else
 		take_forks_odd(philo);
+	
 	if (simulation_finished(info))
 	{
 		put_forks(philo);
@@ -45,9 +76,6 @@ static void	philo_eat_sleep_think(t_philo *philo)
 		return ;
 	print_status(philo, "is sleeping");
 	my_usleep(info->tts, info);
-	print_status(philo, "is thinking");
-	if (info->num_philo % 2)
-		usleep(500);
 }
 
 void	*philo_routine(void *arg)
