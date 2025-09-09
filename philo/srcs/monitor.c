@@ -6,13 +6,12 @@
 /*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 11:19:20 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/09/09 01:04:45 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/09 02:59:01 by JuHyeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-// srcs/monitor.c
 static int	check_if_philo_died(t_philo *philo)
 {
 	long long	now;
@@ -22,7 +21,6 @@ static int	check_if_philo_died(t_philo *philo)
 	if ((now - philo->last_meal) > philo->info->ttd)
 	{
 		pthread_mutex_unlock(&philo->info->meal_mutex);
-		printf("DEBUG: Philo %d died. Last meal was at %lldms, current time is %lldms\n", philo->id, philo->last_meal, now);
 		print_status(philo, "died");
 		pthread_mutex_lock(&philo->info->meal_mutex);
 		philo->info->someone_died = 1;
@@ -32,25 +30,6 @@ static int	check_if_philo_died(t_philo *philo)
 	pthread_mutex_unlock(&philo->info->meal_mutex);
 	return (0);
 }
-
-// static int	check_if_philo_died(t_philo *philo)
-// {
-// 	long long	now;
-
-// 	pthread_mutex_lock(&philo->info->meal_mutex);
-// 	now = get_time_ms();
-// 	if ((now - philo->last_meal) > philo->info->ttd)
-// 	{
-// 		pthread_mutex_unlock(&philo->info->meal_mutex);
-// 		print_status(philo, "died");
-// 		pthread_mutex_lock(&philo->info->meal_mutex);
-// 		philo->info->someone_died = 1;
-// 		pthread_mutex_unlock(&philo->info->meal_mutex);
-// 		return (1);
-// 	}
-// 	pthread_mutex_unlock(&philo->info->meal_mutex);
-// 	return (0);
-// }
 
 static int	check_if_all_ate(t_info *info)
 {

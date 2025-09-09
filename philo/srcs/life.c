@@ -6,33 +6,12 @@
 /*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 23:15:48 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/09/09 01:07:50 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/09 03:00:09 by JuHyeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-// void	take_forks(t_philo *philo)
-// {
-// 	if (philo->id % 2 == 0)
-// 	{
-// 		if (pthread_mutex_lock(philo->right_fork) != 0);
-// 		{
-			
-// 			return ;
-// 		}
-// 		print_status(philo, "has taken a fork");
-// 		pthread_mutex_lock(philo->left_fork);
-// 		print_status(philo, "has taken a fork");
-// 	}
-// 	else
-// 	{
-// 		pthread_mutex_lock(philo->left_fork);
-// 		print_status(philo, "has taken a fork");
-// 		pthread_mutex_lock(philo->right_fork);
-// 		print_status(philo, "has taken a fork");
-// 	}
-// }
 void	take_forks_even(t_philo *philo)
 {
 	if (pthread_mutex_lock(philo->right_fork) != 0)
@@ -77,7 +56,6 @@ void	eat(t_philo *philo)
 	pthread_mutex_lock(&info->meal_mutex);
 	philo->last_meal = get_time_ms();
 	pthread_mutex_unlock(&info->meal_mutex);
-	printf("DEBUG: Philo %d started eating at %lldms\n", philo->id, get_time_ms() - philo->info->start_time);
 	print_status(philo, "is eating");
 	my_usleep(info->tte, info);
 	philo->eat_cnt++;
