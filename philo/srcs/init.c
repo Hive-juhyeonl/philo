@@ -3,18 +3,42 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: juhyeonl <juhyeonl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/01 17:42:38 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/09/07 22:36:50 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/16 13:05:32 by juhyeonl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+bool	is_num(char **av)
+{
+	int		i;
+	int		j;
+	bool	flag;
+
+	flag = true;
+	i = 1;
+	while (av[i] && flag == true)
+	{
+		j = 0;
+		while (av[i][j] && flag == true)
+		{
+			if (!('0' <= av[i][j] && av[i][j] <= '9'))
+				flag = false;
+			j++;
+		}
+		i++;
+	}
+	return (flag);
+}
+
 int	init_info(t_info *info, int ac, char **av)
 {
 	if (ac != 5 && ac != 6)
+		return (1);
+	if (is_num(av) == false)
 		return (1);
 	info->num_philo = ft_atoi(av[1]);
 	info->ttd = ft_atoi(av[2]);

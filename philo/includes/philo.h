@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: juhyeonl <juhyeonl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 11:18:37 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/09/08 03:30:48 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/16 13:02:34 by juhyeonl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <unistd.h>
 # include <stdio.h>
 # include <limits.h>
+# include <stdbool.h>
 
 typedef struct s_info	t_info;
 typedef struct s_philo	t_philo;
