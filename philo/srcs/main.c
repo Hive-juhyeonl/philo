@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JuHyeon <JuHyeon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: juhyeonl <juhyeonl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 11:19:50 by JuHyeon           #+#    #+#             */
-/*   Updated: 2025/09/07 23:06:09 by JuHyeon          ###   ########.fr       */
+/*   Updated: 2025/09/19 14:14:18 by juhyeonl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ static int	start_threads(t_info *info, pthread_t *monitor)
 				philo_routine, &info->philos[i]) != 0)
 			return (cleanup_on_error(info, i));
 		i++;
+		// printf("[DEBUG]\n");
 	}
 	if (pthread_create(monitor, NULL, monitor_routine, info) != 0)
 	{
